@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#01696f" />
+  <title>Family Flow V4</title>
+  <link rel="manifest" href="./assets/manifest.webmanifest" />
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root,[data-theme="light"]{--text-xs:clamp(.75rem,.7rem + .25vw,.875rem);--text-sm:clamp(.875rem,.8rem + .35vw,1rem);--text-base:clamp(1rem,.95rem + .25vw,1.125rem);--text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);--text-xl:clamp(1.45rem,1.15rem + 1.25vw,2rem);--space-2:.5rem;--space-3:.75rem;--space-4:1rem;--space-5:1.25rem;--space-6:1.5rem;--space-8:2rem;--color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;--color-surface-offset:#f3f0ec;--color-border:#d4d1ca;--color-text:#28251d;--color-text-muted:#6f6d67;--color-text-inverse:#f9f8f4;--color-primary:#01696f;--color-primary-hover:#0c4e54;--color-primary-highlight:#cedcd8;--color-success:#437a22;--color-warning:#964219;--color-blue:#006494;--color-error:#a12c7b;--radius-lg:1rem;--radius-xl:1.25rem;--radius-full:9999px;--shadow-sm:0 1px 2px rgba(20,20,10,.06);--shadow-md:0 8px 24px rgba(20,20,10,.08);--shadow-lg:0 20px 44px rgba(20,20,10,.12);--font-body:'Satoshi',system-ui,sans-serif;--transition:180ms cubic-bezier(.16,1,.3,1)}
+    [data-theme="dark"]{--color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;--color-surface-offset:#1d1c1a;--color-border:#393836;--color-text:#cdccca;--color-text-muted:#9c9a97;--color-text-inverse:#2b2a28;--color-primary:#4f98a3;--color-primary-hover:#227f8b;--color-primary-highlight:#313b3b;--color-success:#6daa45;--color-warning:#bb653b;--color-blue:#5591c7;--color-error:#d163a7;--shadow-sm:0 1px 2px rgba(0,0,0,.2);--shadow-md:0 8px 24px rgba(0,0,0,.3);--shadow-lg:0 20px 44px rgba(0,0,0,.42)}
+    *,:before,:after{box-sizing:border-box;margin:0;padding:0} html,body{height:100%;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility} body{font-family:var(--font-body);background:var(--color-bg);color:var(--color-text);font-size:var(--text-base);line-height:1.5;overflow:hidden} button,input,select,textarea{font:inherit;color:inherit} button{border:0;background:none;cursor:pointer} input,select,textarea{background:transparent;border:0;outline:0}
+    .app{height:100dvh;display:grid;grid-template-rows:auto auto 1fr auto}.topbar{display:flex;align-items:center;justify-content:space-between;padding:calc(var(--space-3) + env(safe-area-inset-top)) var(--space-4) var(--space-3);background:color-mix(in srgb,var(--color-surface) 92%, transparent);backdrop-filter:blur(16px);border-bottom:1px solid var(--color-border);gap:var(--space-3)} .brand{display:flex;align-items:center;gap:var(--space-3)} .logo{width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg,var(--color-primary-highlight),var(--color-surface-offset));display:grid;place-items:center;color:var(--color-primary);box-shadow:var(--shadow-sm)} .brand strong{display:block;font-size:var(--text-sm)} .brand span{font-size:var(--text-xs);color:var(--color-text-muted)} .top-actions{display:flex;align-items:center;gap:var(--space-2)} .icon-btn,.btn,.filter-chip{min-height:44px;padding:.78rem .95rem;border-radius:var(--radius-full);transition:all var(--transition)} .icon-btn{min-width:44px;display:grid;place-items:center;background:var(--color-surface-offset);border:1px solid var(--color-border)}
+    .statusbar{display:flex;gap:var(--space-2);padding:var(--space-2) var(--space-4);overflow:auto;border-bottom:1px solid var(--color-border);background:var(--color-surface)} .status-pill{padding:.45rem .7rem;border-radius:var(--radius-full);font-size:var(--text-xs);white-space:nowrap}.online{background:color-mix(in srgb,var(--color-success) 14%, transparent);color:var(--color-success)}.offline{background:color-mix(in srgb,var(--color-warning) 14%, transparent);color:var(--color-warning)}.syncing{background:color-mix(in srgb,var(--color-blue) 14%, transparent);color:var(--color-blue)}.error{background:color-mix(in srgb,var(--color-error) 14%, transparent);color:var(--color-error)}
+    .screen{overflow:auto;padding:var(--space-4);display:grid;gap:var(--space-4);align-content:start}.card,.column{background:var(--color-surface);border:1px solid color-mix(in srgb,var(--color-text) 10%, transparent);border-radius:var(--radius-xl);box-shadow:var(--shadow-md)} .hero,.panel{padding:var(--space-5);display:grid;gap:var(--space-4)} .hero{position:relative;overflow:hidden}.hero:after{content:"";position:absolute;right:-50px;bottom:-50px;width:180px;height:180px;background:radial-gradient(circle,color-mix(in srgb,var(--color-primary) 16%, transparent),transparent 70%)} .eyebrow{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.14em;color:var(--color-primary);font-weight:700}.hero h1{font-size:var(--text-xl);line-height:1.05;letter-spacing:-.04em;max-width:14ch}.hero p,.muted{color:var(--color-text-muted)}
+    .btn,.filter-chip{display:inline-flex;align-items:center;justify-content:center;gap:.55rem;background:var(--color-surface-offset);border:1px solid var(--color-border);white-space:nowrap}.btn-primary{background:var(--color-primary);color:var(--color-text-inverse);border-color:var(--color-primary)}.btn-danger{background:var(--color-error);color:var(--color-text-inverse);border-color:var(--color-error)} .btn-row,.filters,.tools{display:flex;gap:var(--space-2);flex-wrap:wrap}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-3)} .metric{padding:var(--space-4);background:var(--color-surface-2);border-radius:var(--radius-lg);border:1px solid var(--color-border)} .metric strong{display:block;font-size:1.45rem;letter-spacing:-.04em}.metric span,.tiny{font-size:var(--text-xs);color:var(--color-text-muted)}
+    .searchbar{display:flex;align-items:center;gap:var(--space-3);padding:.9rem 1rem;border:1px solid var(--color-border);border-radius:var(--radius-full);background:var(--color-surface-2);flex:1 1 260px}.searchbar input{width:100%}.section-head{display:flex;align-items:end;justify-content:space-between;gap:var(--space-3)} .section-head h2{font-size:var(--text-lg);letter-spacing:-.03em}
+    .columns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(280px,82vw);gap:var(--space-3);overflow:auto;padding-bottom:var(--space-2)} .column{padding:var(--space-4);display:grid;gap:var(--space-3);align-content:start;min-height:360px}.column-head{display:flex;justify-content:space-between;align-items:center}.dropzone{min-height:180px;display:grid;gap:var(--space-3);align-content:start}.dropzone.over{outline:2px dashed var(--color-primary);outline-offset:4px;border-radius:16px}.pill,.badge{padding:.35rem .6rem;border-radius:var(--radius-full);font-size:var(--text-xs)} .pill{background:var(--color-surface-offset);color:var(--color-text-muted)} .badge{display:inline-flex;align-items:center;gap:.3rem}.b-teal{background:color-mix(in srgb,var(--color-primary) 14%, transparent);color:var(--color-primary)}.b-blue{background:color-mix(in srgb,var(--color-blue) 12%, transparent);color:var(--color-blue)}.b-green{background:color-mix(in srgb,var(--color-success) 12%, transparent);color:var(--color-success)}.b-orange{background:color-mix(in srgb,var(--color-warning) 12%, transparent);color:var(--color-warning)}
+    .task{padding:var(--space-4);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-lg);display:grid;gap:var(--space-3);box-shadow:var(--shadow-sm);touch-action:none}.task.dragging{opacity:.5;transform:scale(.98)} .task h4{font-size:var(--text-sm)} .task p{font-size:var(--text-xs);color:var(--color-text-muted)} .task-head,.subline,.task-actions{display:flex;align-items:center;justify-content:space-between;gap:var(--space-2);flex-wrap:wrap}.empty{padding:var(--space-5);border:1px dashed var(--color-border);border-radius:var(--radius-lg);text-align:center;color:var(--color-text-muted);background:var(--color-surface-2)}
+    .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.36);display:none;z-index:40}.sheet-backdrop.open{display:block}.sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--color-surface);border-top-left-radius:24px;border-top-right-radius:24px;border:1px solid var(--color-border);box-shadow:var(--shadow-lg);transform:translateY(110%);transition:transform var(--transition);padding:var(--space-4) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));max-height:90dvh;overflow:auto}.sheet.open{transform:translateY(0)} .sheet h3{font-size:var(--text-lg);margin-bottom:var(--space-3)} .form{display:grid;gap:var(--space-3)} .field{display:grid;gap:var(--space-2)} .field label{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.12em;color:var(--color-text-muted)} .input,.select,.textarea{background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:1rem;padding:.95rem 1rem;min-height:48px} .textarea{min-height:96px;resize:vertical}
+    .bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:var(--space-2);padding:var(--space-2) var(--space-3) calc(var(--space-2) + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--color-surface) 96%, transparent);backdrop-filter:blur(18px);border-top:1px solid var(--color-border)} .bottom-nav button{min-height:52px;border-radius:18px;display:grid;place-items:center;gap:4px;color:var(--color-text-muted)} .bottom-nav button.active{background:var(--color-surface-offset);color:var(--color-text)}
+    @media (min-width:900px){.screen{grid-template-columns:1.2fr .8fr;align-items:start}.full{grid-column:1/-1}.duo{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}.columns{grid-template-columns:repeat(4,1fr);grid-auto-flow:initial;grid-auto-columns:auto;overflow:visible}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo"><svg viewBox="0 0 48 48" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M10 16h18a8 8 0 1 1 0 16H16a6 6 0 1 1 0-12h22"/></svg></div>
+        <div><strong>Family Flow V4</strong><span>indexeddb + drag & drop</span></div>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" id="themeBtn">◐</button>
+        <button class="icon-btn" id="authBtn">☺</button>
+      </div>
+    </header>
+
+    <div class="statusbar">
+      <span class="status-pill online" id="networkState">Онлайн</span>
+      <span class="status-pill syncing" id="saveState">Готово</span>
+      <span class="status-pill" id="backendState">Backend не подключен</span>
+      <span class="status-pill" id="idbState">IndexedDB: init</span>
+      <span class="status-pill" id="queueState">Очередь: 0</span>
+      <span class="status-pill" id="userState">Гость</span>
+    </div>
+
+    <main class="screen">
+      <section class="hero card full">
+        <span class="eyebrow">v4</span>
+        <h1>Durable offline queue, IndexedDB-хранилище и drag-and-drop для семейной канбан-доски</h1>
+        <p>Теперь приложение держит локальный снимок данных в IndexedDB, хранит очередь мутаций отдельно, поддерживает drag-and-drop между колонками и использует позиционирование для устойчивой сортировки карточек.</p>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="openConfigSheet">Настроить Supabase</button>
+          <button class="btn" id="openAuthSheet">Войти</button>
+          <button class="btn" id="createFamilyBtn">Создать семью</button>
+          <button class="btn" id="openInviteSheet">Пригласить</button>
+          <button class="btn" id="flushQueueBtn">Синхронизировать очередь</button>
+        </div>
+        <div class="summary" id="summary"></div>
+      </section>
+
+      <section class="card panel full">
+        <div class="section-head"><div><h2>Поиск и фильтры</h2><p>Local-first view, даже если сеть пропала.</p></div></div>
+        <div class="tools">
+          <div class="searchbar"><span>⌕</span><input id="searchInput" placeholder="Поиск по задачам и участникам" /></div>
+          <div class="filters" id="filters"></div>
+        </div>
+      </section>
+
+      <section class="card panel full">
+        <div class="section-head"><div><h2>Канбан</h2><p>Перетаскивай карточки между колонками. Позиция пересчитывается дробным индексом.</p></div><button class="btn btn-primary" id="openTaskSheet">+ Задача</button></div>
+        <div class="columns" id="columns"></div>
+      </section>
+
+      <div class="duo full">
+        <section class="card panel">
+          <div class="section-head"><div><h2>Семья</h2><p>Роли, доступ и onboarding.</p></div></div>
+          <div id="familyList" class="panel"></div>
+        </section>
+        <section class="card panel">
+          <div class="section-head"><div><h2>Оффлайн-движок</h2><p>Состояние и очередь живут в IndexedDB.</p></div></div>
+          <div class="panel muted" id="offlinePanel">Инициализация локального хранилища…</div>
+        </section>
+      </div>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="active"><div>⌂</div><span>Обзор</span></button>
+      <button><div>▤</div><span>Доска</span></button>
+      <button id="bottomAdd"><div>＋</div><span>Добавить</span></button>
+      <button><div>☷</div><span>Семья</span></button>
+    </nav>
+  </div>
+
+  <div class="sheet-backdrop" id="sheetBackdrop"></div>
+
+  <section class="sheet" id="configSheet">
+    <h3>Настройка Supabase</h3>
+    <form class="form" id="configForm">
+      <div class="field"><label>Project URL</label><input class="input" id="supabaseUrl" placeholder="https://project.supabase.co" /></div>
+      <div class="field"><label>Anon key</label><textarea class="textarea" id="supabaseKey" placeholder="Публичный anon key"></textarea></div>
+      <div class="btn-row"><button class="btn btn-primary" type="submit">Сохранить и подключить</button><button class="btn" type="button" data-close>Закрыть</button></div>
+    </form>
+  </section>
+
+  <section class="sheet" id="authSheet">
+    <h3>Вход по magic link</h3>
+    <form class="form" id="authForm">
+      <div class="field"><label>Email</label><input class="input" id="emailInput" type="email" required placeholder="family@example.com" /></div>
+      <div class="btn-row"><button class="btn btn-primary" type="submit">Отправить ссылку</button><button class="btn" type="button" id="signOutBtn">Выйти</button><button class="btn" type="button" data-close>Закрыть</button></div>
+    </form>
+  </section>
+
+  <section class="sheet" id="taskSheet">
+    <h3 id="taskSheetTitle">Новая задача</h3>
+    <form class="form" id="taskForm">
+      <input type="hidden" id="taskId" />
+      <div class="field"><label>Название</label><input class="input" id="taskTitle" required /></div>
+      <div class="field"><label>Описание</label><textarea class="textarea" id="taskDesc"></textarea></div>
+      <div class="field"><label>Кому</label><select class="select" id="taskAssignee"></select></div>
+      <div class="field"><label>Статус</label><select class="select" id="taskStatus"><option value="inbox">Входящие</option><option value="today">Сегодня</option><option value="planned">Запланировано</option><option value="done">Готово</option></select></div>
+      <div class="field"><label>Приоритет</label><select class="select" id="taskPriority"><option value="P1">P1</option><option value="P2">P2</option><option value="P3">P3</option></select></div>
+      <div class="field"><label>Дата</label><input class="input" id="taskDate" type="datetime-local" /></div>
+      <div class="btn-row"><button class="btn btn-primary" type="submit">Сохранить</button><button class="btn btn-danger" type="button" id="deleteTaskBtn">Удалить</button><button class="btn" type="button" data-close>Закрыть</button></div>
+    </form>
+  </section>
+
+  <section class="sheet" id="inviteSheet">
+    <h3>Пригласить члена семьи</h3>
+    <form class="form" id="inviteForm">
+      <div class="field"><label>Email</label><input class="input" id="inviteEmail" type="email" required /></div>
+      <div class="field"><label>Роль</label><select class="select" id="inviteRole"><option value="member">member</option><option value="admin">admin</option><option value="child">child</option></select></div>
+      <div class="btn-row"><button class="btn btn-primary" type="submit">Создать приглашение</button><button class="btn" type="button" data-close>Закрыть</button></div>
+      <div class="tiny" id="inviteResult"></div>
+    </form>
+  </section>
+
+
+  <section class="sheet" id="confirmDeleteSheet" aria-modal="true" role="dialog" aria-labelledby="confirmDeleteTitle">
+    <h3 id="confirmDeleteTitle">Удалить задачу?</h3>
+    <div class="form">
+      <p class="muted" id="confirmDeleteText">Это действие удалит задачу без мгновенного восстановления в интерфейсе.</p>
+      <div class="btn-row"><button class="btn btn-danger" type="button" id="confirmDeleteBtn">Удалить задачу</button><button class="btn" type="button" data-close>Отмена</button></div>
+    </div>
+  </section>
+
+  <script>
+    const APP_KEY = 'family-flow-v4-config';
+    const DB_NAME = 'family-flow-v4-db';
+    const DB_VERSION = 1;
+    const DEFAULT_STATE = {
+      config:{url:'',key:''}, user:null, family:null, board:null,
+      columns:[{id:'inbox',name:'Входящие'},{id:'today',name:'Сегодня'},{id:'planned',name:'Запланировано'},{id:'done',name:'Готово'}],
+      members:[{id:'anna',name:'Анна',role:'admin'},{id:'mihail',name:'Михаил',role:'member'},{id:'sonya',name:'Соня',role:'child'}],
+      tasks:[
+        {id:crypto.randomUUID(),title:'Купить продукты',description:'Овощи и молоко',assignee_name:'Анна',priority:'P1',status:'today',due_at:'2026-04-21T18:00:00',position:1000},
+        {id:crypto.randomUUID(),title:'Собрать документы',description:'Справка в школу',assignee_name:'Соня',priority:'P2',status:'planned',due_at:'2026-04-23T15:00:00',position:1000}
+      ],
+      search:'', filter:'all', queue:[]
+    };
+
+    let state = loadLocalState();
+    let db = null;
+    let supabase = null;
+    let realtimeChannel = null;
+    let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    let dragTaskId = null;
+    let pendingDeleteTaskId = null;
+    document.documentElement.setAttribute('data-theme', theme);
+
+    const $ = id => document.getElementById(id);
+    const els = {
+      summary:$('summary'), filters:$('filters'), columns:$('columns'), familyList:$('familyList'), searchInput:$('searchInput'),
+      networkState:$('networkState'), saveState:$('saveState'), backendState:$('backendState'), idbState:$('idbState'), queueState:$('queueState'), userState:$('userState'), authBtn:$('authBtn'), offlinePanel:$('offlinePanel'),
+      configSheet:$('configSheet'), authSheet:$('authSheet'), taskSheet:$('taskSheet'), inviteSheet:$('inviteSheet'), backdrop:$('sheetBackdrop'),
+      supabaseUrl:$('supabaseUrl'), supabaseKey:$('supabaseKey'), emailInput:$('emailInput'), inviteEmail:$('inviteEmail'), inviteRole:$('inviteRole'), inviteResult:$('inviteResult'),
+      taskId:$('taskId'), taskTitle:$('taskTitle'), taskDesc:$('taskDesc'), taskAssignee:$('taskAssignee'), taskStatus:$('taskStatus'), taskPriority:$('taskPriority'), taskDate:$('taskDate'), taskSheetTitle:$('taskSheetTitle'), confirmDeleteSheet:$('confirmDeleteSheet'), confirmDeleteText:$('confirmDeleteText')
+    };
+
+    function loadLocalState(){
+      try { return { ...structuredClone(DEFAULT_STATE), ...JSON.parse(localStorage.getItem(APP_KEY) || '{}') }; }
+      catch { return structuredClone(DEFAULT_STATE); }
+    }
+    function persistLocal(label='Сохранено'){ localStorage.setItem(APP_KEY, JSON.stringify({ config: state.config })); els.saveState.textContent = label; render(); }
+
+    function openDb(){
+      return new Promise((resolve,reject)=>{
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = () => {
+          const d = req.result;
+          if(!d.objectStoreNames.contains('state')) d.createObjectStore('state', { keyPath:'key' });
+          if(!d.objectStoreNames.contains('queue')) d.createObjectStore('queue', { keyPath:'id' });
+        };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+    function tx(store, mode='readonly'){ return db.transaction(store, mode).objectStore(store); }
+    function idbPut(store, value){ return new Promise((resolve,reject)=>{ const req = tx(store,'readwrite').put(value); req.onsuccess=()=>resolve(value); req.onerror=()=>reject(req.error); }); }
+    function idbGet(store, key){ return new Promise((resolve,reject)=>{ const req = tx(store).get(key); req.onsuccess=()=>resolve(req.result); req.onerror=()=>reject(req.error); }); }
+    function idbDelete(store, key){ return new Promise((resolve,reject)=>{ const req = tx(store,'readwrite').delete(key); req.onsuccess=()=>resolve(); req.onerror=()=>reject(req.error); }); }
+    function idbGetAll(store){ return new Promise((resolve,reject)=>{ const req = tx(store).getAll(); req.onsuccess=()=>resolve(req.result || []); req.onerror=()=>reject(req.error); }); }
+    async function hydrateFromDb(){
+      const snap = await idbGet('state','snapshot');
+      const queueItems = await idbGetAll('queue');
+      if(snap?.data) state = { ...structuredClone(DEFAULT_STATE), ...snap.data, config: state.config };
+      state.queue = queueItems.sort((a,b)=>a.created_at-b.created_at);
+      els.idbState.textContent = 'IndexedDB: ready';
+    }
+    async function persistSnapshot(label='Снимок сохранён'){
+      await idbPut('state', { key:'snapshot', data:{ ...state, queue:[] } });
+      persistLocal(label);
+    }
+    async function refreshQueueFromDb(){ state.queue = (await idbGetAll('queue')).sort((a,b)=>a.created_at-b.created_at); renderTop(); renderSummary(); }
+    async function queueMutation(item){ await idbPut('queue', item); await refreshQueueFromDb(); }
+
+    function normalize(s=''){ return s.toLowerCase().trim(); }
+    function fmt(date){ if(!date) return 'без даты'; return new Date(date).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+    function visibleTasks(){
+      let list = [...state.tasks];
+      if(state.filter === 'today') list = list.filter(t=>t.status==='today');
+      if(state.filter === 'p1') list = list.filter(t=>t.priority==='P1');
+      if(state.filter && !['all','today','p1'].includes(state.filter)) list = list.filter(t=>t.assignee_name===state.filter);
+      const q = normalize(state.search); if(q) list = list.filter(t => [t.title,t.description,t.assignee_name,t.priority].join(' ').toLowerCase().includes(q));
+      return list.sort((a,b)=>(a.position||0)-(b.position||0));
+    }
+
+    function render(){ renderTop(); renderSummary(); renderFilters(); renderBoard(); renderFamily(); populateAssignees(); }
+    function renderTop(){
+      const online = navigator.onLine;
+      els.networkState.textContent = online ? 'Онлайн' : 'Оффлайн';
+      els.networkState.className = `status-pill ${online?'online':'offline'}`;
+      els.backendState.textContent = supabase ? 'Backend подключен' : 'Backend не подключен';
+      els.userState.textContent = state.user?.email || 'Гость';
+      els.authBtn.textContent = state.user?.email?.[0]?.toUpperCase() || '☺';
+      els.queueState.textContent = `Очередь: ${state.queue.length}`;
+      els.offlinePanel.textContent = online ? 'Сеть активна. Очередь может быть синхронизирована вручную или автоматически при удачных запросах.' : 'Вы оффлайн. Данные читаются из IndexedDB, а операции складываются в durable queue.';
+      els.searchInput.value = state.search || '';
+    }
+    function renderSummary(){ els.summary.innerHTML = `<div class="metric"><strong>${state.tasks.length}</strong><span>Задач</span></div><div class="metric"><strong>${state.members.length}</strong><span>Участников</span></div><div class="metric"><strong>${state.queue.length}</strong><span>В очереди</span></div><div class="metric"><strong>${state.family?.name || 'Локально'}</strong><span>Семья</span></div>`; }
+    function renderFilters(){
+      const filters = [{id:'all',label:'Все'},{id:'today',label:'Сегодня'},{id:'p1',label:'P1'},...state.members.map(m=>({id:m.name,label:m.name}))];
+      els.filters.innerHTML = filters.map(f => `<button class="filter-chip ${state.filter===f.id?'btn-primary':''}" data-filter="${f.id}">${f.label}</button>`).join('');
+      els.filters.querySelectorAll('[data-filter]').forEach(btn => btn.addEventListener('click', ()=>{ state.filter = btn.dataset.filter; persistSnapshot('Фильтр обновлён'); }));
+    }
+    function renderBoard(){
+      const visible = visibleTasks();
+      els.columns.innerHTML = state.columns.map(col => {
+        const tasks = visible.filter(t => t.status === col.id).sort((a,b)=>(a.position||0)-(b.position||0));
+        return `<article class="column"><div class="column-head"><h3>${col.name}</h3><span class="pill">${tasks.length}</span></div><div class="dropzone" data-col="${col.id}">${tasks.length ? tasks.map(taskCard).join('') : '<div class="empty">Нет задач</div>'}</div></article>`;
+      }).join('');
+      bindDnD();
+    }
+    function taskCard(task){
+      return `<article class="task" draggable="true" data-task-id="${task.id}"><div class="task-head"><span class="pill">${task.assignee_name || 'Общий'}</span><span class="badge ${task.priority==='P1'?'b-orange':task.priority==='P2'?'b-blue':'b-green'}">${task.priority}</span></div><h4>${task.title}</h4><p>${task.description || 'Без описания'}</p><div class="subline"><span class="tiny">${fmt(task.due_at)}</span><span class="tiny">pos ${Number(task.position||0).toFixed(2)}</span></div><div class="task-actions"><button class="btn" data-edit="${task.id}">Редактировать</button><button class="btn btn-primary" data-done="${task.id}">Готово</button><button class="btn btn-danger" data-delete-inline="${task.id}">Удалить</button></div></article>`;
+    }
+    function renderFamily(){ els.familyList.innerHTML = state.members.map(m => `<div class="panel" style="padding:1rem;border:1px solid var(--color-border);border-radius:1rem;background:var(--color-surface-2)"><strong>${m.name}</strong><div class="tiny">${m.role}</div><div class="tiny">${state.tasks.filter(t=>t.assignee_name===m.name).length} задач</div></div>`).join(''); }
+    function populateAssignees(){ els.taskAssignee.innerHTML = state.members.map(m => `<option>${m.name}</option>`).join(''); }
+    function resetTaskForm(){ $('taskForm').reset(); els.taskId.value=''; els.taskSheetTitle.textContent='Новая задача'; }
+    function fillTaskForm(task){ els.taskId.value=task.id; els.taskSheetTitle.textContent='Редактировать задачу'; els.taskTitle.value=task.title||''; els.taskDesc.value=task.description||''; els.taskAssignee.value=task.assignee_name||state.members[0]?.name||''; els.taskStatus.value=task.status||'inbox'; els.taskPriority.value=task.priority||'P3'; els.taskDate.value=task.due_at ? task.due_at.slice(0,16) : ''; }
+
+    function bindDnD(){
+      document.querySelectorAll('.task').forEach(card => {
+        card.addEventListener('dragstart', () => { dragTaskId = card.dataset.taskId; card.classList.add('dragging'); });
+        card.addEventListener('dragend', () => { dragTaskId = null; card.classList.remove('dragging'); document.querySelectorAll('.dropzone').forEach(z=>z.classList.remove('over')); });
+      });
+      document.querySelectorAll('.dropzone').forEach(zone => {
+        zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('over'); });
+        zone.addEventListener('dragleave', ()=>zone.classList.remove('over'));
+        zone.addEventListener('drop', async e => {
+          e.preventDefault(); zone.classList.remove('over');
+          if(!dragTaskId) return;
+          const task = state.tasks.find(t=>t.id===dragTaskId); if(!task) return;
+          const colId = zone.dataset.col;
+          const colTasks = state.tasks.filter(t=>t.status===colId && t.id!==task.id).sort((a,b)=>(a.position||0)-(b.position||0));
+          const newPos = nextPosition(colTasks[colTasks.length-1]?.position, null);
+          task.status = colId; task.position = newPos;
+          const dbCol = state.columns.find(c=>c.id===colId)?.db_id || null;
+          task.column_id = dbCol;
+          await persistSnapshot('Позиция обновлена');
+          render();
+          await syncTaskPosition(task);
+        });
+      });
+    }
+    function nextPosition(prev, next){
+      if(prev == null && next == null) return 1000;
+      if(prev == null) return next / 2;
+      if(next == null) return prev + 1000;
+      return (prev + next) / 2;
+    }
+
+    function initSupabase(){
+      if(!(window.supabase && state.config?.url && state.config?.key)) return false;
+      supabase = window.supabase.createClient(state.config.url, state.config.key);
+      bindAuth();
+      return true;
+    }
+    async function bindAuth(){
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        state.user = session?.user ? { id:session.user.id, email:session.user.email } : null;
+        await persistSnapshot('Auth обновлён');
+        if(session?.user){ await ensureProfile(session.user); await loadRemote(); subscribeRealtime(); await acceptInviteFromHash(); }
+      });
+      const { data } = await supabase.auth.getSession();
+      if(data?.session?.user){ state.user = { id:data.session.user.id, email:data.session.user.email }; await ensureProfile(data.session.user); await loadRemote(); subscribeRealtime(); await acceptInviteFromHash(); await persistSnapshot('Сессия восстановлена'); }
+    }
+    async function ensureProfile(user){ await supabase.from('profiles').upsert({ id:user.id, email:user.email }, { onConflict:'id' }); }
+    async function sendMagicLink(email){ const redirect = window.location.href.split('#')[0]; const { error } = await supabase.auth.signInWithOtp({ email, options:{ emailRedirectTo: redirect } }); if(error) throw error; }
+    async function createFamily(){ const name = prompt('Название семьи','Моя семья'); if(!name) return; const { data, error } = await supabase.rpc('bootstrap_family', { family_name:name, board_name:'Семейная доска' }); if(error) throw error; state.family = { id:data, name }; await persistSnapshot('Семья создана'); await loadRemote(); subscribeRealtime(); }
+    async function createInvite(email, role){ const token = crypto.randomUUID(); const expiresAt = new Date(Date.now()+7*24*60*60*1000).toISOString(); const { error } = await supabase.from('family_invites').insert({ family_id:state.family.id, email, role, token, invited_by:state.user.id, expires_at:expiresAt }); if(error) throw error; return `${window.location.origin}${window.location.pathname}#invite=${token}`; }
+    async function acceptInviteFromHash(){ const hash = new URLSearchParams(window.location.hash.replace(/^#/,'')); const token = hash.get('invite'); if(token && supabase && state.user){ const { error } = await supabase.rpc('accept_family_invite', { invite_token: token }); if(!error){ history.replaceState({},'',window.location.pathname); await loadRemote(); } } }
+    async function loadRemote(){
+      if(!supabase || !state.user) return;
+      const { data: memberships } = await supabase.from('family_members').select('family_id').eq('user_id', state.user.id);
+      if(!memberships?.length) return;
+      const familyId = memberships[0].family_id;
+      const { data: families } = await supabase.from('families').select('id,name').eq('id', familyId).limit(1);
+      const { data: members } = await supabase.from('family_members').select('user_id, role, display_name').eq('family_id', familyId);
+      const { data: profiles } = await supabase.from('profiles').select('id,email,full_name').in('id', (members||[]).map(m=>m.user_id));
+      const { data: boards } = await supabase.from('boards').select('id,name').eq('family_id', familyId).order('created_at').limit(1);
+      const boardId = boards?.[0]?.id || null;
+      const { data: columns } = boardId ? await supabase.from('columns').select('id,name,position,board_id').eq('board_id', boardId).order('position') : { data: [] };
+      const { data: tasks } = await supabase.from('tasks').select('id,title,description,status,priority,due_at,assigned_to,created_by,position,column_id,completed_at').eq('family_id', familyId).order('position');
+      state.family = families?.[0] || state.family; state.board = boards?.[0] || state.board;
+      state.columns = columns?.length ? columns.map(c => ({ id: mapDbColumn(c.name), name:c.name, db_id:c.id, board_id:c.board_id })) : state.columns;
+      state.members = (members||[]).map(m => { const p = (profiles||[]).find(pr=>pr.id===m.user_id); return { id:m.user_id, name:m.display_name || p?.full_name || p?.email || 'Участник', role:m.role }; });
+      state.tasks = (tasks||[]).map(t => ({ ...t, assignee_name: resolveAssignee(t.assigned_to), status: normalizeStatus(t.status), position: t.position ?? 1000 }));
+      await persistSnapshot('Данные загружены');
+    }
+    function resolveAssignee(userId){ const member = state.members.find(m => m.id === userId); return member?.name || 'Общий'; }
+    function mapDbColumn(name){ const n = name.toLowerCase(); if(n.includes('сегод')) return 'today'; if(n.includes('готов')) return 'done'; if(n.includes('план')) return 'planned'; return 'inbox'; }
+    function normalizeStatus(status){ if(['inbox','today','planned','done'].includes(status)) return status; return 'inbox'; }
+    function subscribeRealtime(){
+      if(!supabase || !state.family?.id) return;
+      if(realtimeChannel) supabase.removeChannel(realtimeChannel);
+      realtimeChannel = supabase.channel(`family-${state.family.id}`)
+        .on('postgres_changes', { event:'*', schema:'public', table:'tasks', filter:`family_id=eq.${state.family.id}` }, ()=>safeRefresh())
+        .on('postgres_changes', { event:'*', schema:'public', table:'family_members', filter:`family_id=eq.${state.family.id}` }, ()=>safeRefresh())
+        .subscribe();
+      persistSnapshot('Realtime подключён');
+    }
+    async function safeRefresh(){ try { await loadRemote(); } catch { els.saveState.textContent = 'Ошибка refresh'; } }
+
+    async function durableMutation(entry, remoteWork){
+      try {
+        await remoteWork();
+      } catch(error){
+        await queueMutation({ id: entry.id, created_at: Date.now(), type: entry.type, payload: entry.payload });
+        await persistSnapshot('Ошибка сети: добавлено в очередь');
+        return false;
+      }
+      return true;
+    }
+    async function flushQueue(){
+      if(!supabase || !navigator.onLine){ await persistSnapshot('Нужен backend и сеть'); return; }
+      const items = await idbGetAll('queue');
+      for(const item of items.sort((a,b)=>a.created_at-b.created_at)){
+        try {
+          if(item.type === 'task-upsert'){
+            const { id, ...payload } = item.payload;
+            const exists = state.tasks.some(t => t.id === id);
+            const query = exists ? supabase.from('tasks').update(payload).eq('id', id) : supabase.from('tasks').insert({ id, ...payload });
+            const { error } = await query; if(error) throw error;
+          }
+          if(item.type === 'task-delete'){
+            const { error } = await supabase.from('tasks').delete().eq('id', item.payload.id); if(error) throw error;
+          }
+          await idbDelete('queue', item.id);
+        } catch(e) {}
+      }
+      await refreshQueueFromDb();
+      await safeRefresh();
+      await persistSnapshot('Очередь синхронизирована');
+    }
+
+    function taskPayloadFromForm(){
+      const assignee = state.members.find(m => m.name === els.taskAssignee.value);
+      const column = state.columns.find(c => c.id === els.taskStatus.value);
+      return { title:els.taskTitle.value.trim(), description:els.taskDesc.value.trim(), status:els.taskStatus.value, priority:els.taskPriority.value, due_at:els.taskDate.value || null, assigned_to:assignee?.id || null, assignee_name:els.taskAssignee.value, column_id:column?.db_id || null };
+    }
+    async function saveTask(){
+      const payload = taskPayloadFromForm(); if(!payload.title) return;
+      const id = els.taskId.value || crypto.randomUUID();
+      const existing = state.tasks.find(t => t.id === id);
+      const position = existing?.position ?? nextPosition(state.tasks.filter(t=>t.status===payload.status).sort((a,b)=>(a.position||0)-(b.position||0)).slice(-1)[0]?.position, null);
+      const localTask = { id, ...existing, ...payload, position, family_id:state.family?.id || null, board_id:state.board?.id || null, created_by:state.user?.id || null };
+      if(existing) Object.assign(existing, localTask); else state.tasks.unshift(localTask);
+      await persistSnapshot('Локально сохранено');
+      if(supabase && state.family?.id && state.user?.id){
+        const ok = await durableMutation({ id: crypto.randomUUID(), type:'task-upsert', payload:{ ...localTask, family_id: state.family.id, board_id: state.board?.id || null, created_by: state.user.id } }, async () => {
+          const query = existing ? supabase.from('tasks').update({ ...payload, position }).eq('id', id) : supabase.from('tasks').insert({ id, ...payload, family_id: state.family.id, board_id: state.board?.id || null, created_by: state.user.id, position });
+          const { error } = await query; if(error) throw error;
+        });
+        if(ok) await safeRefresh();
+      }
+      resetTaskForm(); closeSheets();
+    }
+    function requestDeleteTask(id){
+      const task = state.tasks.find(t => t.id === id);
+      if(!task) return;
+      pendingDeleteTaskId = id;
+      els.confirmDeleteText.textContent = `Задача «${task.title}» будет удалена. Подтверди удаление, если действие действительно нужно.`;
+      openSheet(els.confirmDeleteSheet);
+    }
+    async function deleteTask(){
+      const id = pendingDeleteTaskId || els.taskId.value; if(!id) return;
+      state.tasks = state.tasks.filter(t => t.id !== id); await persistSnapshot('Удалено локально');
+      if(supabase){ const ok = await durableMutation({ id: crypto.randomUUID(), type:'task-delete', payload:{ id } }, async ()=>{ const { error } = await supabase.from('tasks').delete().eq('id', id); if(error) throw error; }); if(ok) await safeRefresh(); }
+      pendingDeleteTaskId = null;
+      resetTaskForm(); closeSheets();
+    }
+    async function markDone(id){
+      const task = state.tasks.find(t=>t.id===id); if(!task) return; task.status='done'; task.completed_at=new Date().toISOString(); await persistSnapshot('Статус локально обновлён');
+      if(supabase){ const ok = await durableMutation({ id: crypto.randomUUID(), type:'task-upsert', payload:{ id, status:'done', completed_at:task.completed_at } }, async ()=>{ const { error } = await supabase.from('tasks').update({ status:'done', completed_at:task.completed_at }).eq('id', id); if(error) throw error; }); if(ok) await safeRefresh(); }
+    }
+    async function syncTaskPosition(task){
+      if(!(supabase && state.family?.id)){
+        await queueMutation({ id: crypto.randomUUID(), created_at: Date.now(), type:'task-upsert', payload:{ id: task.id, status: task.status, position: task.position, column_id: task.column_id } });
+        await persistSnapshot('Перенос добавлен в очередь');
+        return;
+      }
+      const ok = await durableMutation({ id: crypto.randomUUID(), type:'task-upsert', payload:{ id: task.id, status: task.status, position: task.position, column_id: task.column_id } }, async ()=>{
+        const { error } = await supabase.from('tasks').update({ status: task.status, position: task.position, column_id: task.column_id }).eq('id', task.id);
+        if(error) throw error;
+      });
+      if(ok) await safeRefresh();
+    }
+
+    $('themeBtn').addEventListener('click', ()=>{ theme = theme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', theme); });
+    $('openConfigSheet').addEventListener('click', ()=>openSheet(els.configSheet));
+    $('openAuthSheet').addEventListener('click', ()=>openSheet(els.authSheet));
+    $('openTaskSheet').addEventListener('click', ()=>{ resetTaskForm(); openSheet(els.taskSheet); });
+    $('bottomAdd').addEventListener('click', ()=>{ resetTaskForm(); openSheet(els.taskSheet); });
+    $('openInviteSheet').addEventListener('click', ()=>openSheet(els.inviteSheet));
+    $('createFamilyBtn').addEventListener('click', async ()=>{ try { await createFamily(); } catch(e){ alert(e.message); } });
+    $('flushQueueBtn').addEventListener('click', flushQueue);
+    document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', closeSheets));
+    els.backdrop.addEventListener('click', closeSheets);
+    $('searchInput').addEventListener('input', async e => { state.search = e.target.value; await persistSnapshot('Поиск обновлён'); });
+    $('configForm').addEventListener('submit', async e => { e.preventDefault(); state.config = { url: els.supabaseUrl.value.trim(), key: els.supabaseKey.value.trim() }; persistLocal('Конфиг сохранён'); initSupabase(); closeSheets(); });
+    $('authForm').addEventListener('submit', async e => { e.preventDefault(); if(!supabase) return alert('Сначала настрой Supabase'); try { await sendMagicLink(els.emailInput.value.trim()); alert('Ссылка отправлена'); closeSheets(); } catch(err){ alert(err.message); } });
+    $('signOutBtn').addEventListener('click', async ()=>{ if(supabase) await supabase.auth.signOut(); state.user = null; await persistSnapshot('Выход выполнен'); closeSheets(); });
+    $('taskForm').addEventListener('submit', async e => { e.preventDefault(); await saveTask(); });
+    $('deleteTaskBtn').addEventListener('click', ()=>{ const id = els.taskId.value; if(id) requestDeleteTask(id); });
+    $('confirmDeleteBtn').addEventListener('click', deleteTask);
+    $('inviteForm').addEventListener('submit', async e => { e.preventDefault(); if(!(supabase && state.family?.id && state.user?.id)) return alert('Сначала подключи backend и войди'); try { const link = await createInvite(els.inviteEmail.value.trim(), els.inviteRole.value); els.inviteResult.textContent = `Invite link: ${link}`; } catch(err){ els.inviteResult.textContent = err.message; } });
+    document.addEventListener('click', e => {
+      const edit = e.target.closest('[data-edit]'); if(edit){ const task = state.tasks.find(t => t.id === edit.dataset.edit); if(task){ fillTaskForm(task); openSheet(els.taskSheet); } }
+      const done = e.target.closest('[data-done]'); if(done) markDone(done.dataset.done);
+      const del = e.target.closest('[data-delete-inline]'); if(del) requestDeleteTask(del.dataset.deleteInline);
+    });
+    window.addEventListener('online', ()=>{ renderTop(); flushQueue(); });
+    window.addEventListener('offline', renderTop);
+    if('serviceWorker' in navigator){ window.addEventListener('load', ()=>navigator.serviceWorker.register('./assets/sw.js').catch(()=>{})); }
+    function openSheet(el){ els.backdrop.classList.add('open'); el.classList.add('open'); }
+    function closeSheets(){ els.backdrop.classList.remove('open'); document.querySelectorAll('.sheet').forEach(s=>s.classList.remove('open')); }
+
+    async function boot(){
+      try { db = await openDb(); await hydrateFromDb(); }
+      catch { els.idbState.textContent = 'IndexedDB: error'; }
+      els.supabaseUrl.value = state.config?.url || ''; els.supabaseKey.value = state.config?.key || '';
+      initSupabase(); render();
+    }
+    boot();
+  </script>
+</body>
+</html>
